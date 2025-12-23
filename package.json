@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start:server": "npm start -w @monorepo/server",
-    "start:web": "npm start -w @monorepo/web",
+    "start:server": "npm start -w @repo/server",
+    "start:web": "npm start -w @repo/web",
     "start": "concurrently \"npm run start:web\" \"npm run start:server\""
   },
   "devDependencies": {

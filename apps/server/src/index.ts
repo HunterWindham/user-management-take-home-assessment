@@ -15,14 +15,14 @@ Requirements
   API Key: 7afa46f2e91768e7eeeb9001ce40de19
 */
 
-const express = require("express");
+import express, { Request, Response } from "express";
 const app = express();
 
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
   console.log('triggering  "/" endpoint...');
 
   // define company name
-  let companyName = "RentRedi";
+  const companyName = "RentRedi";
   console.log("companyName = ", companyName);
 
   // send response
