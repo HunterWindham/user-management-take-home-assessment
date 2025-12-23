@@ -3,13 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start:web": "npm start -w apps/server"
+    "start:server": "npm start -w @monorepo/server",
+    "start:web": "npm start -w @monorepo/web"
   },
   "devDependencies": {
     "nodemon": "2.0.12"
   },
   "keywords": [],
   "workspaces": [
-    "apps/server"
+    "apps/server",
+    "apps/web"
   ]
 }
