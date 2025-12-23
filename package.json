@@ -4,9 +4,11 @@
   "description": "",
   "scripts": {
     "start:server": "npm start -w @monorepo/server",
-    "start:web": "npm start -w @monorepo/web"
+    "start:web": "npm start -w @monorepo/web",
+    "start": "concurrently \"npm run start:web\" \"npm run start:server\""
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "nodemon": "2.0.12"
   },
   "keywords": [],
