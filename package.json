@@ -1,15 +1,21 @@
 {
   "name": "nodejs-user-management-short-take-home",
   "version": "1.0.0",
-  "description": "",
+  "type": "module",
   "scripts": {
     "start:server": "npm start -w @monorepo/server",
     "start:web": "npm start -w @monorepo/web",
     "start": "concurrently \"npm run start:web\" \"npm run start:server\""
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/node": "^25.0.3",
     "concurrently": "^9.2.1",
-    "nodemon": "2.0.12"
+    "eslint": "^9.39.2",
+    "globals": "^16.5.0",
+    "nodemon": "2.0.12",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.50.1"
   },
   "keywords": [],
   "workspaces": [
