@@ -16,10 +16,12 @@ Requirements
 */
 
 import express, { Request, Response } from "express";
+import bodyParser from "body-parser";
 import { errorHandler } from "./middleware/errorHandler";
 import userRoutes from "./routes/userRoutes";
 const app = express();
 
+app.use(bodyParser.json());
 app.get("/", (req: Request, res: Response) => {
   console.log('triggering  "/" endpoint...');
 
@@ -35,4 +37,4 @@ app.use("/users", userRoutes);
 
 // errorHandler has to be the last middleware to function correctly.
 app.use(errorHandler);
-app.listen(8080);
+app.listen(process.env.PORT || 8080);
