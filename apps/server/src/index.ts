@@ -16,6 +16,8 @@ Requirements
 */
 
 import express, { Request, Response } from "express";
+import { errorHandler } from "./middleware/errorHandler";
+import userRoutes from "./routes/userRoutes";
 const app = express();
 
 app.get("/", (req: Request, res: Response) => {
@@ -29,4 +31,8 @@ app.get("/", (req: Request, res: Response) => {
   res.send(`Welcome to the ${companyName} interview!`);
 });
 
+app.use("/users", userRoutes);
+
+// errorHandler has to be the last middleware to function correctly.
+app.use(errorHandler);
 app.listen(8080);
