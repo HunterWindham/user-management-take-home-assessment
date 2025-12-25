@@ -2,13 +2,14 @@ import { useState, useRef } from 'react';
 import { Container, Typography, Button, Box } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { UsersTable, type UsersTableRef } from './components/UsersTable';
-import { UserDialog } from './components/UserDialog';
+import { CreateUserDialog } from './components/CreateUserDialog';
+import { EditUserDialog } from './components/EditUserDialog';
 import { DeleteUserDialog } from './components/DeleteUserDialog';
 import type { User } from './types';
 
 function App() {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
@@ -20,15 +21,12 @@ function App() {
   };
 
   const handleCreateClick = () => {
-    setDialogMode('create');
-    setSelectedUser(null);
-    setDialogOpen(true);
+    setCreateDialogOpen(true);
   };
 
   const handleEditUser = (user: User) => {
-    setDialogMode('edit');
     setSelectedUser(user);
-    setDialogOpen(true);
+    setEditDialogOpen(true);
   };
 
   const handleDeleteUser = (user: User) => {
@@ -36,8 +34,12 @@ function App() {
     setDeleteDialogOpen(true);
   };
 
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
+  const handleCloseCreateDialog = () => {
+    setCreateDialogOpen(false);
+  };
+
+  const handleCloseEditDialog = () => {
+    setEditDialogOpen(false);
     setSelectedUser(null);
   };
 
@@ -65,11 +67,15 @@ function App() {
         onEditUser={handleEditUser}
         onDeleteUser={handleDeleteUser}
       />
-      <UserDialog
-        open={dialogOpen}
-        mode={dialogMode}
+      <CreateUserDialog
+        open={createDialogOpen}
+        onClose={handleCloseCreateDialog}
+        onSuccess={handleSuccess}
+      />
+      <EditUserDialog
+        open={editDialogOpen}
         user={selectedUser}
-        onClose={handleCloseDialog}
+        onClose={handleCloseEditDialog}
         onSuccess={handleSuccess}
       />
       <DeleteUserDialog

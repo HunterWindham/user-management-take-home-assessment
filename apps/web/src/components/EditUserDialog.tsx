@@ -1,0 +1,145 @@
+import { useState, useEffect, type FormEvent } from 'react';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Box,
+  Alert,
+} from '@mui/material';
+import { updateUser, type UpdateUserInput } from '../services/userService';
+import type { User } from '../types';
+
+type EditUserDialogProps = {
+  open: boolean;
+  user: User | null;
+  onClose: () => void;
+  onSuccess: () => void;
+};
+
+export const EditUserDialog = ({
+  open,
+  user,
+  onClose,
+  onSuccess,
+}: EditUserDialogProps) => {
+  const [name, setName] = useState('');
+  const [zipCode, setZipCode] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Populate form when user changes
+  useEffect(() => {
+    if (user) {
+      setName(user.name);
+      setZipCode(user.zipCode ?? '');
+    }
+  }, [user]);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!user) return;
+
+    // Validation - name is required
+    if (!name.trim()) {
+      setError('Name is required');
+      return;
+    }
+
+    if (name.trim().length > 255) {
+      setError('Name must be 255 characters or less');
+      return;
+    }
+
+    if (zipCode.trim() && zipCode.trim().length < 3) {
+      setError('Zip code must be at least 3 characters if provided');
+      return;
+    }
+
+    if (zipCode.trim().length > 20) {
+      setError('Zip code must be 20 characters or less');
+      return;
+    }
+
+    // Check if anything changed
+    const nameChanged = name.trim() !== user.name;
+    const zipCodeChanged = zipCode.trim() !== (user.zipCode ?? '');
+
+    if (!nameChanged && !zipCodeChanged) {
+      setError('No changes detected');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      // Always send name (required), send zipCode if changed or to clear it
+      const input: UpdateUserInput = {
+        name: name.trim(),
+      };
+      
+      if (zipCodeChanged) {
+        // Allow clearing zipCode by sending null (undefined would be omitted from JSON)
+        input.zipCode = zipCode.trim() ? zipCode.trim() : null;
+      }
+
+      await updateUser(user.id, input);
+      handleClose();
+      onSuccess();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update user');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    if (!loading) {
+      setError(null);
+      onClose();
+    }
+  };
+
+  return (
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <form onSubmit={handleSubmit}>
+        <DialogTitle>Edit User</DialogTitle>
+        <DialogContent>
+          <Box display="flex" flexDirection="column" gap={2} pt={1}>
+            {error && <Alert severity="error">{error}</Alert>}
+            <TextField
+              label="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              fullWidth
+              disabled={loading}
+              helperText="Required. 1-255 characters."
+              autoFocus
+            />
+            <TextField
+              label="Zip Code"
+              value={zipCode}
+              onChange={(e) => setZipCode(e.target.value)}
+              fullWidth
+              disabled={loading}
+              helperText="Optional. 3-20 characters. Leave empty to clear. Location data will be re-fetched if changed."
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} disabled={loading}>
+            Cancel
+          </Button>
+          <Button type="submit" variant="contained" disabled={loading}>
+            {loading ? 'Updating...' : 'Update User'}
+          </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
+  );
+};
+
