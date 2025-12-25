@@ -61,6 +61,6 @@ export async function getLocationDataByZipCode(
       timezone: timezoneString,
     };
   } catch (error) {
-    throw new Error("Location lookup failed");
+    throw new Error(`Location lookup failed: ${error}`);
   }
 }

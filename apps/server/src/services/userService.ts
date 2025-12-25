@@ -1,4 +1,4 @@
-import db from "../config/firebase";
+import { db } from "../config/firebase";
 import { getLocationDataByZipCode } from "./locationService";
 import { User } from "../models/user";
 import { UserData } from "../types";

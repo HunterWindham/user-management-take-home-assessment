@@ -1,5 +1,5 @@
 import admin from "firebase-admin";
-const serviceAccount = require("../../service-account.json");
+import serviceAccount from "../../service-account.json";
 
 if (!process.env.DB_URL) {
   throw new Error("DB_URL environtment variable is required");
@@ -7,12 +7,11 @@ if (!process.env.DB_URL) {
 
 try {
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
     databaseURL: process.env.DB_URL,
   });
 } catch (error) {
-  throw new Error("Failed to initialize Firebase");
+  throw new Error(`Failed to initialize Firebase: ${error}`);
 }
 
-const db = admin.database();
-export default db;
+export const db = admin.database();
