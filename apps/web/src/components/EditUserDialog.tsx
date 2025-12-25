@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { updateUser, type UpdateUserInput } from '../services/userService';
 import type { User } from '../types';
+import { validateUserForm } from '../utils/validation';
 
 type EditUserDialogProps = {
   open: boolean;
@@ -44,24 +45,10 @@ export const EditUserDialog = ({
 
     if (!user) return;
 
-    // Validation - name is required
-    if (!name.trim()) {
-      setError('Name is required');
-      return;
-    }
-
-    if (name.trim().length > 255) {
-      setError('Name must be 255 characters or less');
-      return;
-    }
-
-    if (zipCode.trim() && zipCode.trim().length < 3) {
-      setError('Zip code must be at least 3 characters if provided');
-      return;
-    }
-
-    if (zipCode.trim().length > 20) {
-      setError('Zip code must be 20 characters or less');
+    // Validation
+    const validationError = validateUserForm({ name, zipCode });
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -104,12 +91,26 @@ export const EditUserDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog 
+      open={open} 
+      onClose={handleClose} 
+      maxWidth="sm" 
+      fullWidth
+      PaperProps={{
+        className: "rounded-lg",
+      }}
+    >
       <form onSubmit={handleSubmit}>
-        <DialogTitle>Edit User</DialogTitle>
+        <DialogTitle className="text-xl font-semibold pb-2">
+          Edit User
+        </DialogTitle>
         <DialogContent>
-          <Box display="flex" flexDirection="column" gap={2} pt={1}>
-            {error && <Alert severity="error">{error}</Alert>}
+          <Box display="flex" flexDirection="column" gap={3} pt={1}>
+            {error && (
+              <Alert severity="error" className="rounded-lg">
+                {error}
+              </Alert>
+            )}
             <TextField
               label="Name"
               value={name}
@@ -119,6 +120,7 @@ export const EditUserDialog = ({
               disabled={loading}
               helperText="Required. 1-255 characters."
               autoFocus
+              variant="outlined"
             />
             <TextField
               label="Zip Code"
@@ -127,14 +129,24 @@ export const EditUserDialog = ({
               fullWidth
               disabled={loading}
               helperText="Optional. 3-20 characters. Leave empty to clear. Location data will be re-fetched if changed."
+              variant="outlined"
             />
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} disabled={loading}>
+        <DialogActions className="px-6 pb-4 gap-2">
+          <Button 
+            onClick={handleClose} 
+            disabled={loading}
+            variant="outlined"
+          >
             Cancel
           </Button>
-          <Button type="submit" variant="contained" disabled={loading}>
+          <Button 
+            type="submit" 
+            variant="contained" 
+            disabled={loading}
+            className="min-w-[120px]"
+          >
             {loading ? 'Updating...' : 'Update User'}
           </Button>
         </DialogActions>

@@ -51,21 +51,36 @@ export const DeleteUserDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Delete User</DialogTitle>
+    <Dialog 
+      open={open} 
+      onClose={handleClose} 
+      maxWidth="sm" 
+      fullWidth
+      PaperProps={{
+        className: "rounded-lg",
+      }}
+    >
+      <DialogTitle className="text-xl font-semibold pb-2 text-red-600">
+        Delete User
+      </DialogTitle>
       <DialogContent>
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
+          <Alert severity="error" className="rounded-lg mb-3">
             {error}
           </Alert>
         )}
-        <Typography>
-          Are you sure you want to delete user: <strong>{user?.name}</strong>? This
-          action cannot be undone.
+        <Typography variant="body1" className="text-gray-700">
+          Are you sure you want to delete user{' '}
+          <strong className="text-gray-900">{user?.name}</strong>? This action
+          cannot be undone.
         </Typography>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} disabled={loading}>
+      <DialogActions className="px-6 pb-4 gap-2">
+        <Button 
+          onClick={handleClose} 
+          disabled={loading}
+          variant="outlined"
+        >
           Cancel
         </Button>
         <Button
@@ -73,6 +88,7 @@ export const DeleteUserDialog = ({
           variant="contained"
           color="error"
           disabled={loading}
+          className="min-w-[100px]"
         >
           {loading ? 'Deleting...' : 'Delete'}
         </Button>

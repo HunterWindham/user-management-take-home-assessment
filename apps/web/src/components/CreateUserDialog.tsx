@@ -10,6 +10,7 @@ import {
   Alert,
 } from '@mui/material';
 import { createUser, type CreateUserInput } from '../services/userService';
+import { validateUserForm } from '../utils/validation';
 
 type CreateUserDialogProps = {
   open: boolean;
@@ -32,23 +33,9 @@ export const CreateUserDialog = ({
     setError(null);
 
     // Validation
-    if (!name.trim()) {
-      setError('Name is required');
-      return;
-    }
-
-    if (name.trim().length > 255) {
-      setError('Name must be 255 characters or less');
-      return;
-    }
-
-    if (zipCode.trim() && zipCode.trim().length < 3) {
-      setError('Zip code must be at least 3 characters if provided');
-      return;
-    }
-
-    if (zipCode.trim().length > 20) {
-      setError('Zip code must be 20 characters or less');
+    const validationError = validateUserForm({ name, zipCode });
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -79,12 +66,26 @@ export const CreateUserDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog 
+      open={open} 
+      onClose={handleClose} 
+      maxWidth="sm" 
+      fullWidth
+      PaperProps={{
+        className: "rounded-lg",
+      }}
+    >
       <form onSubmit={handleSubmit}>
-        <DialogTitle>Create New User</DialogTitle>
+        <DialogTitle className="text-xl font-semibold pb-2">
+          Create New User
+        </DialogTitle>
         <DialogContent>
-          <Box display="flex" flexDirection="column" gap={2} pt={1}>
-            {error && <Alert severity="error">{error}</Alert>}
+          <Box display="flex" flexDirection="column" gap={3} pt={1}>
+            {error && (
+              <Alert severity="error" className="rounded-lg">
+                {error}
+              </Alert>
+            )}
             <TextField
               label="Name"
               value={name}
@@ -94,6 +95,8 @@ export const CreateUserDialog = ({
               disabled={loading}
               helperText="Required. 1-255 characters."
               autoFocus
+              variant="outlined"
+              className="rounded-lg"
             />
             <TextField
               label="Zip Code"
@@ -102,14 +105,24 @@ export const CreateUserDialog = ({
               fullWidth
               disabled={loading}
               helperText="Optional. 3-20 characters. Location data will be fetched automatically."
+              variant="outlined"
             />
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} disabled={loading}>
+        <DialogActions className="px-6 pb-4 gap-2">
+          <Button 
+            onClick={handleClose} 
+            disabled={loading}
+            variant="outlined"
+          >
             Cancel
           </Button>
-          <Button type="submit" variant="contained" disabled={loading}>
+          <Button 
+            type="submit" 
+            variant="contained" 
+            disabled={loading}
+            className="min-w-[120px]"
+          >
             {loading ? 'Creating...' : 'Create User'}
           </Button>
         </DialogActions>

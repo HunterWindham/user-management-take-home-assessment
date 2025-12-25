@@ -49,42 +49,57 @@ function App() {
   };
 
   return (
-    <Container maxWidth="lg" className="py-8">
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4" component="h1">
-          User Management
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleCreateClick}
+    <div className="min-h-screen bg-gray-50">
+      <Container maxWidth="lg" className="py-8">
+        <Box 
+          display="flex" 
+          justifyContent="space-between" 
+          alignItems="center" 
+          mb={4}
+          pt={4}
+          className="flex-col sm:flex-row gap-4"
         >
-          Create User
-        </Button>
-      </Box>
-      <UsersTable
-        ref={tableRef}
-        onEditUser={handleEditUser}
-        onDeleteUser={handleDeleteUser}
-      />
-      <CreateUserDialog
-        open={createDialogOpen}
-        onClose={handleCloseCreateDialog}
-        onSuccess={handleSuccess}
-      />
-      <EditUserDialog
-        open={editDialogOpen}
-        user={selectedUser}
-        onClose={handleCloseEditDialog}
-        onSuccess={handleSuccess}
-      />
-      <DeleteUserDialog
-        open={deleteDialogOpen}
-        user={userToDelete}
-        onClose={handleCloseDeleteDialog}
-        onSuccess={handleSuccess}
-      />
-    </Container>
+          <Typography 
+            variant="h4" 
+            component="h1" 
+            className="font-bold text-gray-900"
+          >
+            User Management
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleCreateClick}
+            className="shadow-md hover:shadow-lg transition-shadow"
+            size="large"
+          >
+            Create User
+          </Button>
+        </Box>
+        <UsersTable
+          ref={tableRef}
+          onEditUser={handleEditUser}
+          onDeleteUser={handleDeleteUser}
+        />
+        <CreateUserDialog
+          open={createDialogOpen}
+          onClose={handleCloseCreateDialog}
+          onSuccess={handleSuccess}
+        />
+        <EditUserDialog
+          open={editDialogOpen}
+          user={selectedUser}
+          onClose={handleCloseEditDialog}
+          onSuccess={handleSuccess}
+        />
+        <DeleteUserDialog
+          open={deleteDialogOpen}
+          user={userToDelete}
+          onClose={handleCloseDeleteDialog}
+          onSuccess={handleSuccess}
+        />
+      </Container>
+    </div>
   );
 }
 
