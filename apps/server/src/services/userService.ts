@@ -43,7 +43,7 @@ export class UserService {
 
     // Name is required
     if (!name) {
-      throw new Error("Name and zip code are required");
+      throw new Error("Name is required");
     }
 
     // Fetch location data from OpenWeatherMap

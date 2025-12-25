@@ -48,10 +48,6 @@ export class UserController {
       );
     }
 
-    const updateData: { name?: string; zipCode?: string } = {};
-    if (name !== undefined) updateData.name = name;
-    if (zipCode !== undefined) updateData.zipCode = zipCode;
-
     const user = await UserService.updateUser(id, { name, zipCode });
 
     const response: ApiResponse<UserData> = {

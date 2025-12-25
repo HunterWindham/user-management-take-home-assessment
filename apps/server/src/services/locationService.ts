@@ -26,37 +26,41 @@ export async function getLocationDataByZipCode(
     throw new Error("Valid zip code is required");
   }
 
-  const response = await axios.get<OpenWeatherMapResponse>(BASE_URL, {
-    params: {
-      zip: zipCode,
-      appid: OWM_API_KEY,
-    },
-    timeout: 10000, // 10 second timeout
-  });
+  try {
+    const response = await axios.get<OpenWeatherMapResponse>(BASE_URL, {
+      params: {
+        zip: zipCode,
+        appid: OWM_API_KEY,
+      },
+      timeout: 10000, // 10 second timeout
+    });
 
-  const { coord, timezone } = response.data;
+    const { coord, timezone } = response.data;
 
-  if (!coord || coord.lat === undefined || coord.lon === undefined) {
-    throw new Error("Invalid response: missing coordinates");
+    if (!coord || coord.lat === undefined || coord.lon === undefined) {
+      throw new Error("Invalid response: missing coordinates");
+    }
+
+    // OpenWeatherMap returns timezone offset in seconds, convert to timezone string
+    // Format: UTC offset as ±HH:MM
+    const timezoneOffsetSeconds = timezone;
+    const timezoneOffsetHours = Math.floor(timezoneOffsetSeconds / 3600);
+    const timezoneOffsetMinutes = Math.floor(
+      Math.abs(timezoneOffsetSeconds % 3600) / 60
+    );
+
+    // Format hours with sign and padding
+    const sign = timezoneOffsetHours >= 0 ? "+" : "-";
+    const hoursStr = String(Math.abs(timezoneOffsetHours)).padStart(2, "0");
+    const minutesStr = String(timezoneOffsetMinutes).padStart(2, "0");
+    const timezoneString = `UTC${sign}${hoursStr}:${minutesStr}`;
+
+    return {
+      latitude: coord.lat,
+      longitude: coord.lon,
+      timezone: timezoneString,
+    };
+  } catch (error) {
+    throw new Error("Location lookup failed");
   }
-
-  // OpenWeatherMap returns timezone offset in seconds, convert to timezone string
-  // Format: UTC offset as ±HH:MM
-  const timezoneOffsetSeconds = timezone;
-  const timezoneOffsetHours = Math.floor(timezoneOffsetSeconds / 3600);
-  const timezoneOffsetMinutes = Math.floor(
-    Math.abs(timezoneOffsetSeconds % 3600) / 60
-  );
-
-  // Format hours with sign and padding
-  const sign = timezoneOffsetHours >= 0 ? "+" : "-";
-  const hoursStr = String(Math.abs(timezoneOffsetHours)).padStart(2, "0");
-  const minutesStr = String(timezoneOffsetMinutes).padStart(2, "0");
-  const timezoneString = `UTC${sign}${hoursStr}:${minutesStr}`;
-
-  return {
-    latitude: coord.lat,
-    longitude: coord.lon,
-    timezone: timezoneString,
-  };
 }

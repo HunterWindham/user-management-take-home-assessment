@@ -32,7 +32,7 @@ export class User {
       this.latitude !== null &&
       (typeof this.zipCode !== "string" || this.zipCode.trim().length === 0)
     ) {
-      errors.push("Zip code is required and must be a non-empty string");
+      errors.push("Zip code must be a non-empty string");
     }
 
     if (
