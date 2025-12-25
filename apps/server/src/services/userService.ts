@@ -89,25 +89,47 @@ export class UserService {
       throw new Error("User not found");
     }
 
-    // Determine if zip code changed
-    const zipCodeChanged =
-      updateData.zipCode && updateData.zipCode !== existingUser.zipCode;
+    // Determine if zip code was explicitly provided (including null to clear it)
+    const zipCodeProvided = "zipCode" in updateData;
+    const newZipCode = zipCodeProvided ? updateData.zipCode : undefined;
+    const zipCodeChanged = zipCodeProvided && newZipCode !== existingUser.zipCode;
 
-    // If zip code changed, fetch new location data
+    // If zip code changed, fetch new location data (or clear if null)
     let locationData = null;
-    if (zipCodeChanged && updateData.zipCode) {
-      locationData = await getLocationDataByZipCode(updateData.zipCode);
+    if (zipCodeChanged && newZipCode && typeof newZipCode === "string") {
+      // zipCode is a non-null string, fetch location data
+      locationData = await getLocationDataByZipCode(newZipCode);
     }
+
     // Build update object
     const updatedUser = new User({
       id: existingUser.id,
       name: updateData.name ? updateData.name.trim() : existingUser.name,
-      zipCode: updateData.zipCode
-        ? updateData.zipCode.trim()
+      zipCode: zipCodeProvided
+        ? newZipCode === null
+          ? null
+          : typeof newZipCode === "string"
+          ? newZipCode.trim()
+          : existingUser.zipCode
         : existingUser.zipCode,
-      latitude: locationData ? locationData.latitude : existingUser.latitude,
-      longitude: locationData ? locationData.longitude : existingUser.longitude,
-      timezone: locationData ? locationData.timezone : existingUser.timezone,
+      latitude:
+        zipCodeChanged && newZipCode === null
+          ? null
+          : locationData
+          ? locationData.latitude
+          : existingUser.latitude,
+      longitude:
+        zipCodeChanged && newZipCode === null
+          ? null
+          : locationData
+          ? locationData.longitude
+          : existingUser.longitude,
+      timezone:
+        zipCodeChanged && newZipCode === null
+          ? null
+          : locationData
+          ? locationData.timezone
+          : existingUser.timezone,
     });
 
     // Validate updated user

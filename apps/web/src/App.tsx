@@ -2,15 +2,35 @@ import { useState, useRef } from 'react';
 import { Container, Typography, Button, Box } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { UsersTable, type UsersTableRef } from './components/UsersTable';
-import { CreateUserDialog } from './components/CreateUserDialog';
+import { UserDialog } from './components/UserDialog';
+import type { User } from './types';
 
 function App() {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const tableRef = useRef<UsersTableRef>(null);
 
-  const handleCreateSuccess = () => {
-    // Refresh the table after successful creation
+  const handleSuccess = () => {
+    // Refresh the table after successful create/update
     tableRef.current?.refresh();
+  };
+
+  const handleCreateClick = () => {
+    setDialogMode('create');
+    setSelectedUser(null);
+    setDialogOpen(true);
+  };
+
+  const handleEditUser = (user: User) => {
+    setDialogMode('edit');
+    setSelectedUser(user);
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedUser(null);
   };
 
   return (
@@ -22,16 +42,18 @@ function App() {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => setDialogOpen(true)}
+          onClick={handleCreateClick}
         >
           Create User
         </Button>
       </Box>
-      <UsersTable ref={tableRef} />
-      <CreateUserDialog
+      <UsersTable ref={tableRef} onEditUser={handleEditUser} />
+      <UserDialog
         open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        onSuccess={handleCreateSuccess}
+        mode={dialogMode}
+        user={selectedUser}
+        onClose={handleCloseDialog}
+        onSuccess={handleSuccess}
       />
     </Container>
   );

@@ -10,15 +10,22 @@ import {
   Typography,
   CircularProgress,
   Box,
+  IconButton,
 } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
 import type { User } from '../types';
 import { fetchUsers } from '../services/userService';
+
+export type UsersTableProps = {
+  onEditUser: (user: User) => void;
+};
 
 export type UsersTableRef = {
   refresh: () => Promise<void>;
 };
 
-export const UsersTable = forwardRef<UsersTableRef>((_props, ref) => {
+export const UsersTable = forwardRef<UsersTableRef, UsersTableProps>(
+  ({ onEditUser }, ref) => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,12 +78,13 @@ export const UsersTable = forwardRef<UsersTableRef>((_props, ref) => {
             <TableCell align="right">Latitude</TableCell>
             <TableCell align="right">Longitude</TableCell>
             <TableCell>Timezone</TableCell>
+            <TableCell align="right">Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {users.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} align="center">
+              <TableCell colSpan={6} align="center">
                 <Typography>No users found</Typography>
               </TableCell>
             </TableRow>
@@ -88,6 +96,15 @@ export const UsersTable = forwardRef<UsersTableRef>((_props, ref) => {
                 <TableCell align="right">{user.latitude?.toFixed(4) ?? '—'}</TableCell>
                 <TableCell align="right">{user.longitude?.toFixed(4) ?? '—'}</TableCell>
                 <TableCell>{user.timezone ?? '—'}</TableCell>
+                <TableCell align="right">
+                  <IconButton
+                    size="small"
+                    onClick={() => onEditUser(user)}
+                    aria-label="edit user"
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))
           )}
@@ -95,7 +112,8 @@ export const UsersTable = forwardRef<UsersTableRef>((_props, ref) => {
       </Table>
     </TableContainer>
   );
-});
+  }
+);
 
 UsersTable.displayName = 'UsersTable';
 
