@@ -1,8 +1,14 @@
+import { Container, Typography } from '@mui/material';
+import { UsersTable } from './components/UsersTable';
+
 function App() {
   return (
-    <div>
-      <h1>App</h1>
-    </div>
+    <Container maxWidth="lg" className="py-8">
+      <Typography variant="h4" component="h1" gutterBottom className="mb-6">
+        User Management
+      </Typography>
+      <UsersTable />
+    </Container>
   );
 }
 
