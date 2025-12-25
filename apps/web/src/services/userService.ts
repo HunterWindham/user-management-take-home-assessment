@@ -89,3 +89,25 @@ export const updateUser = async (
   return apiResponse.data;
 };
 
+/**
+ * Deletes a user
+ */
+export const deleteUser = async (id: string): Promise<void> => {
+  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.users}/${id}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.message || `Failed to delete user: ${response.statusText}`
+    );
+  }
+
+  const apiResponse: ApiResponse = await response.json();
+
+  if (!apiResponse.success) {
+    throw new Error(apiResponse.message || 'Failed to delete user');
+  }
+};
+

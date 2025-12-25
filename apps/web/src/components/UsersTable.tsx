@@ -13,11 +13,13 @@ import {
   IconButton,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import type { User } from '../types';
 import { fetchUsers } from '../services/userService';
 
 export type UsersTableProps = {
   onEditUser: (user: User) => void;
+  onDeleteUser: (user: User) => void;
 };
 
 export type UsersTableRef = {
@@ -25,7 +27,7 @@ export type UsersTableRef = {
 };
 
 export const UsersTable = forwardRef<UsersTableRef, UsersTableProps>(
-  ({ onEditUser }, ref) => {
+  ({ onEditUser, onDeleteUser }, ref) => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -75,10 +77,10 @@ export const UsersTable = forwardRef<UsersTableRef, UsersTableProps>(
           <TableRow>
             <TableCell>Name</TableCell>
             <TableCell>Zip Code</TableCell>
-            <TableCell align="right">Latitude</TableCell>
-            <TableCell align="right">Longitude</TableCell>
+            <TableCell>Latitude</TableCell>
+            <TableCell>Longitude</TableCell>
             <TableCell>Timezone</TableCell>
-            <TableCell align="right">Actions</TableCell>
+            <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -93,16 +95,24 @@ export const UsersTable = forwardRef<UsersTableRef, UsersTableProps>(
               <TableRow key={user.id} hover>
                 <TableCell>{user.name}</TableCell>
                 <TableCell>{user.zipCode ?? '—'}</TableCell>
-                <TableCell align="right">{user.latitude?.toFixed(4) ?? '—'}</TableCell>
-                <TableCell align="right">{user.longitude?.toFixed(4) ?? '—'}</TableCell>
+                <TableCell>{user.latitude?.toFixed(4) ?? '—'}</TableCell>
+                <TableCell>{user.longitude?.toFixed(4) ?? '—'}</TableCell>
                 <TableCell>{user.timezone ?? '—'}</TableCell>
-                <TableCell align="right">
+                <TableCell>
                   <IconButton
                     size="small"
                     onClick={() => onEditUser(user)}
                     aria-label="edit user"
                   >
                     <EditIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={() => onDeleteUser(user)}
+                    aria-label="delete user"
+                    color="error"
+                  >
+                    <DeleteIcon fontSize="small" />
                   </IconButton>
                 </TableCell>
               </TableRow>
