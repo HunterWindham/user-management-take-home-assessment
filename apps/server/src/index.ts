@@ -17,11 +17,14 @@ Requirements
 
 import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
+import cors from "cors";
 import { errorHandler } from "./middleware/errorHandler";
 import userRoutes from "./routes/userRoutes";
 const app = express();
 
+app.use(cors());
 app.use(bodyParser.json());
+
 app.get("/", (req: Request, res: Response) => {
   console.log('triggering  "/" endpoint...');
 
