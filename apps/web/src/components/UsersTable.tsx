@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import {
   Table,
   TableBody,
@@ -14,26 +14,34 @@ import {
 import type { User } from '../types';
 import { fetchUsers } from '../services/userService';
 
-export const UsersTable = () => {
+export type UsersTableRef = {
+  refresh: () => Promise<void>;
+};
+
+export const UsersTable = forwardRef<UsersTableRef>((_props, ref) => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadUsers = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchUsers();
-        setUsers(data);
-        setError(null);
-      } catch (err) {
-        setError('Failed to load users');
-        console.error('Error fetching users:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadUsers = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchUsers();
+      setUsers(data);
+      setError(null);
+    } catch (err) {
+      setError('Failed to load users');
+      console.error('Error fetching users:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useImperativeHandle(ref, () => ({
+    refresh: loadUsers,
+  }));
+
+  useEffect(() => {
     loadUsers();
   }, []);
 
@@ -87,5 +95,7 @@ export const UsersTable = () => {
       </Table>
     </TableContainer>
   );
-};
+});
+
+UsersTable.displayName = 'UsersTable';
 

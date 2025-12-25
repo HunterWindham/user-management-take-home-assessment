@@ -1,6 +1,11 @@
 import { API_BASE_URL, API_ENDPOINTS } from '../config/api';
 import type { User, ApiResponse } from '../types';
 
+export type CreateUserInput = {
+  name: string;
+  zipCode?: string;
+};
+
 /**
  * Fetches all users from the API
  */
@@ -15,6 +20,34 @@ export const fetchUsers = async (): Promise<User[]> => {
 
   if (!apiResponse.success || !apiResponse.data) {
     throw new Error(apiResponse.message || 'Failed to fetch users');
+  }
+
+  return apiResponse.data;
+};
+
+/**
+ * Creates a new user
+ */
+export const createUser = async (input: CreateUserInput): Promise<User> => {
+  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.users}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(input),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.message || `Failed to create user: ${response.statusText}`
+    );
+  }
+
+  const apiResponse: ApiResponse<User> = await response.json();
+
+  if (!apiResponse.success || !apiResponse.data) {
+    throw new Error(apiResponse.message || 'Failed to create user');
   }
 
   return apiResponse.data;
