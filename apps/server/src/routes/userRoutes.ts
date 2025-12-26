@@ -1,10 +1,7 @@
 import express from "express";
 import { UserController } from "../controllers/userController";
-import {
-  validateUserCreate,
-  validateUserUpdate,
-  handleValidationErrors,
-} from "../middleware/validation";
+import { validate } from "../middleware/validation";
+import * as userValidation from "../validations/user.validation";
 
 const router = express.Router();
 
@@ -14,15 +11,13 @@ router.get("/:id", UserController.getUserById);
 
 router.post(
   "/",
-  validateUserCreate,
-  handleValidationErrors,
+  validate(userValidation.createUser),
   UserController.createUser
 );
 
 router.put(
   "/:id",
-  validateUserUpdate,
-  handleValidationErrors,
+  validate(userValidation.updateUser),
   UserController.updateUser
 );
 

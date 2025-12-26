@@ -1,43 +1,31 @@
-/*
-Task name: User endpoints
+import { createServer } from './app';
 
-Requirements
-  1.  We need to create CRUD endpoints
-  2.  The entries (users) can just be saved in a noSQL database (Bonus for using Firebase Realtime Database)
-  3.  Each user should have the following data entries: 
-        id, name, zip code, latitude, longitude, timezone
-  4.  When creating a user, allow input for name and zip code.  
-      (Fetch the latitude, longitude, and timezone - Documentation: https://openweathermap.org/current) 
-  5.  When updating a user, Re-fetch the latitude, longitude, and timezone (if zip code changes)
-  6.  Connect to a ReactJS front-end
-  * feel free to add add something creative you'd like
-
-  API Key: 7afa46f2e91768e7eeeb9001ce40de19
-*/
-
-import express, { Request, Response } from "express";
-import bodyParser from "body-parser";
-import cors from "cors";
-import { errorHandler } from "./middleware/errorHandler";
-import userRoutes from "./routes/userRoutes";
-const app = express();
-
-app.use(cors());
-app.use(bodyParser.json());
-
-app.get("/", (req: Request, res: Response) => {
-  console.log('triggering  "/" endpoint...');
-
-  // define company name
-  const companyName = "RentRedi";
-  console.log("companyName = ", companyName);
-
-  // send response
-  res.send(`Welcome to the ${companyName} interview!`);
+const server = createServer().listen(process.env.PORT || 8080, () => {
+  console.log(`Listening to port ${process.env.PORT || 8080}`);
 });
 
-app.use("/users", userRoutes);
+const exitHandler = () => {
+  if (server) {
+    server.close(() => {
+      console.log('Server closed');
+      process.exit(1);
+    });
+  } else {
+    process.exit(1);
+  }
+};
 
-// errorHandler has to be the last middleware to function correctly.
-app.use(errorHandler);
-app.listen(process.env.PORT || 8080);
+const unexpectedErrorHandler = (error: unknown) => {
+  console.error(error);
+  exitHandler();
+};
+
+process.on('uncaughtException', unexpectedErrorHandler);
+process.on('unhandledRejection', unexpectedErrorHandler);
+
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received');
+  if (server) {
+    server.close();
+  }
+});

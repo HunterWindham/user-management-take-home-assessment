@@ -1,74 +1,38 @@
-import {
-  body,
-  type ValidationChain,
-  validationResult,
-} from "express-validator";
+import { type ValidationChain, validationResult } from "express-validator";
 import type { Request, Response, NextFunction } from "express";
 
 /**
- * Validation rules for user creation
+ * Reusable validation middleware that accepts validation chains
+ * and handles validation errors
+ *
+ * @param validations - Array of validation chains to apply
+ * @returns Express middleware function
+ *
+ * @example
+ * ```ts
+ * router.post("/", validate(userValidation.createUser), controller.create);
+ * ```
  */
-export const validateUserCreate: ValidationChain[] = [
-  body("name")
-    .trim()
-    .notEmpty()
-    .withMessage("Name is required")
-    .isLength({ min: 1, max: 255 })
-    .withMessage("Name must be between 1 and 255 characters"),
-  body("zipCode")
-    .optional()
-    .trim()
-    .notEmpty()
-    .withMessage("Zip code cannot be empty if provided")
-    .isLength({ min: 3, max: 20 })
-    .withMessage("Zip code must be between 3 and 20 characters"),
-];
+export function validate(validations: ValidationChain[]) {
+  return async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    // Run all validations
+    await Promise.all(validations.map((validation) => validation.run(req)));
 
-/**
- * Validation rules for user update
- */
-export const validateUserUpdate: ValidationChain[] = [
-  body("name")
-    .optional()
-    .trim()
-    .notEmpty()
-    .withMessage("Name cannot be empty if provided")
-    .isLength({ min: 1, max: 255 })
-    .withMessage("Name must be between 1 and 255 characters"),
-  body("zipCode")
-    .optional({ nullable: true })
-    .custom((value) => {
-      // Allow null to clear zipCode
-      if (value === null || value === undefined) {
-        return true;
-      }
-      // If provided, must be a non-empty string
-      if (typeof value !== "string" || value.trim().length === 0) {
-        throw new Error("Zip code cannot be empty if provided");
-      }
-      // Validate length
-      if (value.trim().length < 3 || value.trim().length > 20) {
-        throw new Error("Zip code must be between 3 and 20 characters");
-      }
-      return true;
-    }),
-];
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: errors.array(),
+      });
+      return;
+    }
 
-/**
- * Middleware to check validation results
- */
-export function handleValidationErrors(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    res.status(400).json({
-      success: false,
-      message: "Validation failed",
-    });
-    return;
-  }
-  next();
+    next();
+  };
 }
