@@ -7,16 +7,16 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Typography,
-  CircularProgress,
   Box,
   IconButton,
-  Alert,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import type { User } from '../types';
 import { fetchUsers } from '../services/userService';
+import { LoadingState } from './LoadingState';
+import { ErrorState } from './ErrorState';
+import { EmptyState } from './EmptyState';
 
 export type UsersTableProps = {
   onEditUser: (user: User) => void;
@@ -56,38 +56,11 @@ export const UsersTable = forwardRef<UsersTableRef, UsersTableProps>(
   }, [loadUsers]);
 
   if (loading) {
-    return (
-      <Box 
-        display="flex" 
-        justifyContent="center" 
-        alignItems="center" 
-        minHeight="400px"
-        className="rounded-lg border border-gray-200 bg-white"
-      >
-        <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
-          <CircularProgress />
-          <Typography variant="body2" color="text.secondary">
-            Loading users...
-          </Typography>
-        </Box>
-      </Box>
-    );
+    return <LoadingState message="Loading users..." />;
   }
 
   if (error) {
-    return (
-      <Box 
-        display="flex" 
-        justifyContent="center" 
-        alignItems="center" 
-        minHeight="400px"
-        className="rounded-lg border border-red-200 bg-red-50"
-      >
-        <Alert severity="error" className="w-full max-w-md">
-          {error}
-        </Alert>
-      </Box>
-    );
+    return <ErrorState message={error} />;
   }
 
   return (
@@ -110,13 +83,10 @@ export const UsersTable = forwardRef<UsersTableRef, UsersTableProps>(
         </TableHead>
         <TableBody>
           {users.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={6} align="center" className="py-12">
-                <Typography variant="body1" color="text.secondary">
-                  No users found. Create your first user to get started.
-                </Typography>
-              </TableCell>
-            </TableRow>
+            <EmptyState 
+              message="No users found. Create your first user to get started."
+              colSpan={6}
+            />
           ) : (
             users.map((user) => (
               <TableRow 
