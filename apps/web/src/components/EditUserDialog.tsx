@@ -96,9 +96,6 @@ export const EditUserDialog = ({
       onClose={handleClose} 
       maxWidth="sm" 
       fullWidth
-      PaperProps={{
-        className: "rounded-lg",
-      }}
     >
       <form onSubmit={handleSubmit}>
         <DialogTitle className="text-xl font-semibold pb-2">

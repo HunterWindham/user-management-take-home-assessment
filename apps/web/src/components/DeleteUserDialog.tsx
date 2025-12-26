@@ -56,9 +56,6 @@ export const DeleteUserDialog = ({
       onClose={handleClose} 
       maxWidth="sm" 
       fullWidth
-      PaperProps={{
-        className: "rounded-lg",
-      }}
     >
       <DialogTitle className="text-xl font-semibold pb-2 text-red-600">
         Delete User

@@ -43,7 +43,7 @@ export const CreateUserDialog = ({
       setLoading(true);
       const input: CreateUserInput = {
         name: name.trim(),
-        ...(zipCode.trim() && { zipCode: zipCode.trim() }),
+        zipCode: zipCode.trim(),
       };
 
       await createUser(input);
@@ -71,9 +71,6 @@ export const CreateUserDialog = ({
       onClose={handleClose} 
       maxWidth="sm" 
       fullWidth
-      PaperProps={{
-        className: "rounded-lg",
-      }}
     >
       <form onSubmit={handleSubmit}>
         <DialogTitle className="text-xl font-semibold pb-2">
