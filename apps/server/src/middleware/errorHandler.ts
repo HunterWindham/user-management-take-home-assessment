@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import type { ApiResponse } from "../types";
 import { HttpError } from "../utils/httpErrors";
 
@@ -9,7 +9,9 @@ import { HttpError } from "../utils/httpErrors";
 export function errorHandler(
   err: Error | HttpError,
   req: Request,
-  res: Response
+  res: Response,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  next: NextFunction
 ): void {
   // HttpError instances have a statusCode property
   const statusCode = err instanceof HttpError ? err.statusCode : 500;

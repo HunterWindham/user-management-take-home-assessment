@@ -2,12 +2,19 @@ import { db } from "../config/firebase";
 import { getLocationDataByZipCode } from "./locationService";
 import { User } from "../models/user";
 import { UserData } from "../types";
-import { BadRequestError, NotFoundError } from "../utils/httpErrors";
+import {
+  BadRequestError,
+  InternalServerError,
+  NotFoundError,
+} from "../utils/httpErrors";
 const USERS_REF = "users";
 
 const generateUserId = (): string => {
   const ref = db.ref(USERS_REF).push();
-  return ref.key || "";
+  if (!ref.key) {
+    throw new InternalServerError("Failed to generate user ID");
+  }
+  return ref.key;
 };
 
 export class UserService {
@@ -95,7 +102,8 @@ export class UserService {
     // Determine if zip code was explicitly provided (including null to clear it)
     const zipCodeProvided = "zipCode" in updateData;
     const newZipCode = zipCodeProvided ? updateData.zipCode : undefined;
-    const zipCodeChanged = zipCodeProvided && newZipCode !== existingUser.zipCode;
+    const zipCodeChanged =
+      zipCodeProvided && newZipCode !== existingUser.zipCode;
 
     // If zip code changed, fetch new location data (or clear if null)
     let locationData = null;
