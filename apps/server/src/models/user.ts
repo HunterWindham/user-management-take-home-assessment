@@ -28,11 +28,13 @@ export class User {
       errors.push("Name is required and must be a non-empty string");
     }
 
+    // If zipCode is provided, it must be a non-empty string
+    // If zipCode is null, that's valid (location data may not be available)
     if (
-      this.latitude !== null &&
+      this.zipCode !== null &&
       (typeof this.zipCode !== "string" || this.zipCode.trim().length === 0)
     ) {
-      errors.push("Zip code must be a non-empty string");
+      errors.push("Zip code must be a non-empty string if provided");
     }
 
     if (

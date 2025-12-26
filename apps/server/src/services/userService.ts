@@ -2,6 +2,7 @@ import { db } from "../config/firebase";
 import { getLocationDataByZipCode } from "./locationService";
 import { User } from "../models/user";
 import { UserData } from "../types";
+import { BadRequestError, NotFoundError } from "../utils/httpErrors";
 const USERS_REF = "users";
 
 const generateUserId = (): string => {
@@ -24,7 +25,7 @@ export class UserService {
 
   static getUserById = async (userId: string): Promise<User | null> => {
     if (!userId) {
-      throw new Error("User ID is required");
+      throw new BadRequestError("User ID is required");
     }
 
     const userRef = db.ref(`${USERS_REF}/${userId}`);
@@ -43,7 +44,7 @@ export class UserService {
 
     // Name is required
     if (!name) {
-      throw new Error("Name is required");
+      throw new BadRequestError("Name is required");
     }
 
     // Fetch location data from OpenWeatherMap
@@ -65,7 +66,9 @@ export class UserService {
     // Validate user data
     const validation = user.validate();
     if (!validation.valid) {
-      throw new Error("User validation failed");
+      throw new BadRequestError(
+        `User validation failed: ${validation.errors.join(", ")}`
+      );
     }
 
     // Save to Firebase
@@ -80,13 +83,13 @@ export class UserService {
     updateData: Partial<UserData>
   ): Promise<User> => {
     if (!userId) {
-      throw new Error("User ID is required to update");
+      throw new BadRequestError("User ID is required to update");
     }
 
     // Get existing user
     const existingUser = await this.getUserById(userId);
     if (!existingUser) {
-      throw new Error("User not found");
+      throw new NotFoundError("User not found");
     }
 
     // Determine if zip code was explicitly provided (including null to clear it)
@@ -135,7 +138,9 @@ export class UserService {
     // Validate updated user
     const validation = updatedUser.validate();
     if (!validation.valid) {
-      throw new Error("User validation failed");
+      throw new BadRequestError(
+        `User validation failed: ${validation.errors.join(", ")}`
+      );
     }
 
     // Update in Firebase
@@ -147,7 +152,7 @@ export class UserService {
 
   static deleteUser = async (userId: string): Promise<boolean> => {
     if (!userId) {
-      throw new Error("User ID is required");
+      throw new BadRequestError("User ID is required");
     }
 
     const userRef = db.ref(`${USERS_REF}/${userId}`);

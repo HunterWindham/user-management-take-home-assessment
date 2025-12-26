@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { UserService } from "../services/userService";
 import { ApiResponse, UserData } from "../types";
+import { NotFoundError, BadRequestError } from "../utils/httpErrors";
 
 export class UserController {
   static getAllUsers = async (req: Request, res: Response) => {
@@ -17,7 +18,7 @@ export class UserController {
     const user = await UserService.getUserById(id);
 
     if (!user) {
-      throw new Error("User not found");
+      throw new NotFoundError("User not found");
     }
 
     const response: ApiResponse<UserData> = {
@@ -42,8 +43,8 @@ export class UserController {
     const { id } = req.params;
     const { name, zipCode } = req.body;
 
-    if (!name && !zipCode) {
-      throw new Error(
+    if (!name && zipCode === undefined) {
+      throw new BadRequestError(
         "At least one field (name or zipCode) must be provided for update"
       );
     }
@@ -63,7 +64,7 @@ export class UserController {
     const deleted = await UserService.deleteUser(id);
 
     if (!deleted) {
-      throw new Error("User was not deleted");
+      throw new NotFoundError("User not found");
     }
 
     const response: ApiResponse = {

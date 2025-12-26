@@ -1,4 +1,5 @@
 import { body, type ValidationChain } from "express-validator";
+import { ValidationError } from "../utils/httpErrors";
 
 /**
  * Validation rules for user creation
@@ -39,11 +40,11 @@ export const updateUser: ValidationChain[] = [
       }
       // If provided, must be a non-empty string
       if (typeof value !== "string" || value.trim().length === 0) {
-        throw new Error("Zip code cannot be empty if provided");
+        throw new ValidationError("Zip code cannot be empty if provided");
       }
       // Validate length
       if (value.trim().length < 3 || value.trim().length > 20) {
-        throw new Error("Zip code must be between 3 and 20 characters");
+        throw new ValidationError("Zip code must be between 3 and 20 characters");
       }
       return true;
     }),

@@ -1,4 +1,5 @@
 import admin from "firebase-admin";
+import { InternalServerError } from "../utils/httpErrors";
 
 // Validate required environment variables
 const requiredEnvVars = [
@@ -12,7 +13,7 @@ const requiredEnvVars = [
 
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
-    throw new Error(`${envVar} environment variable is required`);
+    throw new InternalServerError(`${envVar} environment variable is required`);
   }
 }
 
@@ -44,7 +45,9 @@ try {
     databaseURL: process.env.DB_URL!,
   });
 } catch (error) {
-  throw new Error(`Failed to initialize Firebase: ${error}`);
+  throw new InternalServerError(
+    `Failed to initialize Firebase: ${error instanceof Error ? error.message : "Unknown error"}`
+  );
 }
 
 export const db = admin.database();
