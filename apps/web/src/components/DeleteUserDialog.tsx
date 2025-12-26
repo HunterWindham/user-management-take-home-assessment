@@ -1,15 +1,8 @@
-import { useState } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-  Alert,
-} from '@mui/material';
+import { useState, type FormEvent } from 'react';
+import { Typography } from '@mui/material';
 import { deleteUser } from '../services/userService';
 import type { User } from '../types';
+import { DialogForm } from './DialogForm';
 
 type DeleteUserDialogProps = {
   open: boolean;
@@ -27,7 +20,8 @@ export const DeleteUserDialog = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleDelete = async () => {
+  const handleDelete = async (e: FormEvent) => {
+    e.preventDefault();
     if (!user) return;
 
     try {
@@ -51,46 +45,23 @@ export const DeleteUserDialog = ({
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={handleClose} 
-      maxWidth="sm" 
-      fullWidth
+    <DialogForm
+      open={open}
+      onClose={handleClose}
+      title="Delete User"
+      error={error}
+      loading={loading}
+      submitLabel={loading ? 'Deleting...' : 'Delete'}
+      onSubmit={handleDelete}
+      submitButtonColor="error"
+      titleClassName="text-xl font-semibold pb-2 text-red-600"
     >
-      <DialogTitle className="text-xl font-semibold pb-2 text-red-600">
-        Delete User
-      </DialogTitle>
-      <DialogContent>
-        {error && (
-          <Alert severity="error" className="rounded-lg mb-3">
-            {error}
-          </Alert>
-        )}
-        <Typography variant="body1" className="text-gray-700">
-          Are you sure you want to delete user{' '}
-          <strong className="text-gray-900">{user?.name}</strong>? This action
-          cannot be undone.
-        </Typography>
-      </DialogContent>
-      <DialogActions className="px-6 pb-4 gap-2">
-        <Button 
-          onClick={handleClose} 
-          disabled={loading}
-          variant="outlined"
-        >
-          Cancel
-        </Button>
-        <Button
-          onClick={handleDelete}
-          variant="contained"
-          color="error"
-          disabled={loading}
-          className="min-w-[100px]"
-        >
-          {loading ? 'Deleting...' : 'Delete'}
-        </Button>
-      </DialogActions>
-    </Dialog>
+      <Typography variant="body1" className="text-gray-700">
+        Are you sure you want to delete user{' '}
+        <strong className="text-gray-900">{user?.name}</strong>? This action
+        cannot be undone.
+      </Typography>
+    </DialogForm>
   );
 };
 

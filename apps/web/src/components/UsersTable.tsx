@@ -1,22 +1,12 @@
 import { useEffect, useState, useImperativeHandle, forwardRef, useCallback } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Box,
-  IconButton,
-} from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import type { User } from '../types';
 import { fetchUsers } from '../services/userService';
 import { LoadingState } from './LoadingState';
 import { ErrorState } from './ErrorState';
-import { EmptyState } from './EmptyState';
+import { DataTable, type Column } from './DataTable';
 
 export type UsersTableProps = {
   onEditUser: (user: User) => void;
@@ -63,82 +53,70 @@ export const UsersTable = forwardRef<UsersTableRef, UsersTableProps>(
     return <ErrorState message={error} />;
   }
 
+  const columns: Column<User>[] = [
+    {
+      header: 'Name',
+      render: (user) => <span className="font-medium">{user.name}</span>,
+    },
+    {
+      header: 'Zip Code',
+      render: (user) => user.zipCode ?? <span className="text-gray-400">—</span>,
+    },
+    {
+      header: 'Latitude',
+      render: (user) =>
+        user.latitude !== null ? (
+          <span className="font-mono text-sm">{user.latitude.toFixed(4)}</span>
+        ) : (
+          <span className="text-gray-400">—</span>
+        ),
+    },
+    {
+      header: 'Longitude',
+      render: (user) =>
+        user.longitude !== null ? (
+          <span className="font-mono text-sm">{user.longitude.toFixed(4)}</span>
+        ) : (
+          <span className="text-gray-400">—</span>
+        ),
+    },
+    {
+      header: 'Timezone',
+      render: (user) => user.timezone ?? <span className="text-gray-400">—</span>,
+    },
+    {
+      header: 'Actions',
+      align: 'center',
+      render: (user) => (
+        <Box display="flex" gap={0.5} justifyContent="center">
+          <IconButton
+            size="small"
+            onClick={() => onEditUser(user)}
+            aria-label="edit user"
+            className="hover:bg-blue-50"
+          >
+            <EditIcon fontSize="small" className="text-blue-600" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={() => onDeleteUser(user)}
+            aria-label="delete user"
+            className="hover:bg-red-50"
+          >
+            <DeleteIcon fontSize="small" className="text-red-600" />
+          </IconButton>
+        </Box>
+      ),
+    },
+  ];
+
   return (
-    <TableContainer 
-      component={Paper} 
-      className="rounded-lg shadow-sm border border-gray-200 overflow-x-auto"
-    >
-      <Table sx={{ minWidth: 650 }}>
-        <TableHead>
-          <TableRow className="bg-gray-50">
-            <TableCell className="font-semibold">Name</TableCell>
-            <TableCell className="font-semibold">Zip Code</TableCell>
-            <TableCell className="font-semibold">Latitude</TableCell>
-            <TableCell className="font-semibold">Longitude</TableCell>
-            <TableCell className="font-semibold">Timezone</TableCell>
-            <TableCell className="font-semibold" align="center">
-              Actions
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {users.length === 0 ? (
-            <EmptyState 
-              message="No users found. Create your first user to get started."
-              colSpan={6}
-            />
-          ) : (
-            users.map((user) => (
-              <TableRow 
-                key={user.id} 
-                hover 
-                className="transition-colors"
-              >
-                <TableCell className="font-medium">{user.name}</TableCell>
-                <TableCell>{user.zipCode ?? <span className="text-gray-400">—</span>}</TableCell>
-                <TableCell>
-                  {user.latitude !== null ? (
-                    <span className="font-mono text-sm">{user.latitude.toFixed(4)}</span>
-                  ) : (
-                    <span className="text-gray-400">—</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {user.longitude !== null ? (
-                    <span className="font-mono text-sm">{user.longitude.toFixed(4)}</span>
-                  ) : (
-                    <span className="text-gray-400">—</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {user.timezone ?? <span className="text-gray-400">—</span>}
-                </TableCell>
-                <TableCell align="center">
-                  <Box display="flex" gap={0.5} justifyContent="center">
-                    <IconButton
-                      size="small"
-                      onClick={() => onEditUser(user)}
-                      aria-label="edit user"
-                      className="hover:bg-blue-50"
-                    >
-                      <EditIcon fontSize="small" className="text-blue-600" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => onDeleteUser(user)}
-                      aria-label="delete user"
-                      className="hover:bg-red-50"
-                    >
-                      <DeleteIcon fontSize="small" className="text-red-600" />
-                    </IconButton>
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <DataTable
+      columns={columns}
+      data={users}
+      getRowKey={(user) => user.id}
+      emptyMessage="No users found. Create your first user to get started."
+    />
   );
   }
 );

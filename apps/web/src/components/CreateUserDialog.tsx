@@ -1,16 +1,8 @@
 import { useState, type FormEvent } from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  Box,
-  Alert,
-} from '@mui/material';
 import { createUser, type CreateUserInput } from '../services/userService';
 import { validateUserForm } from '../utils/validation';
+import { DialogForm } from './DialogForm';
+import { UserFormFields } from './UserFormFields';
 
 type CreateUserDialogProps = {
   open: boolean;
@@ -66,65 +58,24 @@ export const CreateUserDialog = ({
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={handleClose} 
-      maxWidth="sm" 
-      fullWidth
+    <DialogForm
+      open={open}
+      onClose={handleClose}
+      title="Create New User"
+      error={error}
+      loading={loading}
+      submitLabel={loading ? 'Creating...' : 'Create User'}
+      onSubmit={handleSubmit}
     >
-      <form onSubmit={handleSubmit}>
-        <DialogTitle className="text-xl font-semibold pb-2">
-          Create New User
-        </DialogTitle>
-        <DialogContent>
-          <Box display="flex" flexDirection="column" gap={3} pt={1}>
-            {error && (
-              <Alert severity="error" className="rounded-lg">
-                {error}
-              </Alert>
-            )}
-            <TextField
-              label="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              fullWidth
-              disabled={loading}
-              helperText="Required. 1-255 characters."
-              autoFocus
-              variant="outlined"
-              className="rounded-lg"
-            />
-            <TextField
-              label="Zip Code"
-              value={zipCode}
-              onChange={(e) => setZipCode(e.target.value)}
-              fullWidth
-              disabled={loading}
-              helperText="Optional. 3-20 characters. Location data will be fetched automatically."
-              variant="outlined"
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions className="px-6 pb-4 gap-2">
-          <Button 
-            onClick={handleClose} 
-            disabled={loading}
-            variant="outlined"
-          >
-            Cancel
-          </Button>
-          <Button 
-            type="submit" 
-            variant="contained" 
-            disabled={loading}
-            className="min-w-[120px]"
-          >
-            {loading ? 'Creating...' : 'Create User'}
-          </Button>
-        </DialogActions>
-      </form>
-    </Dialog>
+      <UserFormFields
+        name={name}
+        zipCode={zipCode}
+        onNameChange={setName}
+        onZipCodeChange={setZipCode}
+        disabled={loading}
+        autoFocus
+      />
+    </DialogForm>
   );
 };
 
