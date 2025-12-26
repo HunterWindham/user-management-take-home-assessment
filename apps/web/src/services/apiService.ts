@@ -14,6 +14,7 @@ class ApiService {
 
   /**
    * Performs a fetch request with error handling
+   * Handles network errors, HTTP errors, and API response validation
    */
   private async request<T>(
     endpoint: string,
@@ -24,38 +25,47 @@ class ApiService {
       'Content-Type': 'application/json',
     };
 
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        ...defaultHeaders,
-        ...options.headers,
-      },
-    });
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          ...defaultHeaders,
+          ...options.headers,
+        },
+      });
 
-    // Try to parse error response if request failed
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      const errorMessage =
-        errorData.message || `Request failed: ${response.statusText}`;
-      throw new Error(errorMessage);
+      // Try to parse error response if request failed
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage =
+          errorData.message || `Request failed: ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
+
+      // Parse successful response
+      const apiResponse: ApiResponse<T> = await response.json();
+
+      // Validate API response structure
+      if (!apiResponse.success) {
+        throw new Error(
+          apiResponse.message || 'Request failed: Unknown error'
+        );
+      }
+
+      // For DELETE requests, data might be undefined
+      if (apiResponse.data === undefined && options.method !== 'DELETE') {
+        throw new Error(apiResponse.message || 'Request failed: No data returned');
+      }
+
+      return apiResponse.data as T;
+    } catch (error) {
+      // Re-throw if it's already an Error (from our validation above)
+      if (error instanceof Error) {
+        throw error;
+      }
+      // Handle network errors or other unexpected errors
+      throw new Error('Network error: Unable to connect to the server');
     }
-
-    // Parse successful response
-    const apiResponse: ApiResponse<T> = await response.json();
-
-    // Validate API response structure
-    if (!apiResponse.success) {
-      throw new Error(
-        apiResponse.message || 'Request failed: Unknown error'
-      );
-    }
-
-    // For DELETE requests, data might be undefined
-    if (apiResponse.data === undefined && options.method !== 'DELETE') {
-      throw new Error(apiResponse.message || 'Request failed: No data returned');
-    }
-
-    return apiResponse.data as T;
   }
 
   /**

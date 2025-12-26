@@ -2,11 +2,6 @@
  * Validation utilities for user forms
  */
 
-export type ValidationError = {
-  field: string;
-  message: string;
-};
-
 export type UserFormData = {
   name: string;
   zipCode: string;
@@ -28,12 +23,13 @@ export const validateUserForm = (data: UserFormData): string | null => {
     return 'Name must be 255 characters or less';
   }
 
-  if (trimmedZipCode && trimmedZipCode.length < 3) {
-    return 'Zip code must be at least 3 characters if provided';
-  }
-
-  if (trimmedZipCode.length > 20) {
-    return 'Zip code must be 20 characters or less';
+  if (trimmedZipCode) {
+    if (trimmedZipCode.length < 3) {
+      return 'Zip code must be at least 3 characters if provided';
+    }
+    if (trimmedZipCode.length > 20) {
+      return 'Zip code must be 20 characters or less';
+    }
   }
 
   return null;

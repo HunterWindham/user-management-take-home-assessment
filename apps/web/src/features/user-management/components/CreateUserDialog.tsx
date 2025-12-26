@@ -35,7 +35,8 @@ export const CreateUserDialog = ({
       setLoading(true);
       const input: CreateUserInput = {
         name: name.trim(),
-        zipCode: zipCode.trim(),
+        // Only include zipCode if it's not empty
+        ...(zipCode.trim() && { zipCode: zipCode.trim() }),
       };
 
       await createUser(input);
