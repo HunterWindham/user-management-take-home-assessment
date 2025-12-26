@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Typography } from '@mui/material';
 import { deleteUser } from '../services/userService';
 import type { User } from '../types';
-import { DialogForm } from './DialogForm';
+import { DialogForm } from '../../../components/DialogForm';
 
 type DeleteUserDialogProps = {
   open: boolean;

@@ -1,41 +1,28 @@
-import { useState, useEffect, type FormEvent } from 'react';
-import { updateUser, type UpdateUserInput } from '../services/userService';
-import type { User } from '../types';
+import { useState, type FormEvent } from 'react';
+import { createUser, type CreateUserInput } from '../services/userService';
 import { validateUserForm } from '../utils/validation';
-import { DialogForm } from './DialogForm';
+import { DialogForm } from '../../../components/DialogForm';
 import { UserFormFields } from './UserFormFields';
 
-type EditUserDialogProps = {
+type CreateUserDialogProps = {
   open: boolean;
-  user: User | null;
   onClose: () => void;
   onSuccess: () => void;
 };
 
-export const EditUserDialog = ({
+export const CreateUserDialog = ({
   open,
-  user,
   onClose,
   onSuccess,
-}: EditUserDialogProps) => {
+}: CreateUserDialogProps) => {
   const [name, setName] = useState('');
   const [zipCode, setZipCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Populate form when user changes
-  useEffect(() => {
-    if (user) {
-      setName(user.name);
-      setZipCode(user.zipCode ?? '');
-    }
-  }, [user]);
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
-
-    if (!user) return;
 
     // Validation
     const validationError = validateUserForm({ name, zipCode });
@@ -44,32 +31,18 @@ export const EditUserDialog = ({
       return;
     }
 
-    // Check if anything changed
-    const nameChanged = name.trim() !== user.name;
-    const zipCodeChanged = zipCode.trim() !== (user.zipCode ?? '');
-
-    if (!nameChanged && !zipCodeChanged) {
-      setError('No changes detected');
-      return;
-    }
-
     try {
       setLoading(true);
-      // Always send name (required), send zipCode if changed or to clear it
-      const input: UpdateUserInput = {
+      const input: CreateUserInput = {
         name: name.trim(),
+        zipCode: zipCode.trim(),
       };
-      
-      if (zipCodeChanged) {
-        // Allow clearing zipCode by sending null (undefined would be omitted from JSON)
-        input.zipCode = zipCode.trim() ? zipCode.trim() : null;
-      }
 
-      await updateUser(user.id, input);
+      await createUser(input);
       handleClose();
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update user');
+      setError(err instanceof Error ? err.message : 'Failed to create user');
     } finally {
       setLoading(false);
     }
@@ -77,6 +50,8 @@ export const EditUserDialog = ({
 
   const handleClose = () => {
     if (!loading) {
+      setName('');
+      setZipCode('');
       setError(null);
       onClose();
     }
@@ -86,10 +61,10 @@ export const EditUserDialog = ({
     <DialogForm
       open={open}
       onClose={handleClose}
-      title="Edit User"
+      title="Create New User"
       error={error}
       loading={loading}
-      submitLabel={loading ? 'Updating...' : 'Update User'}
+      submitLabel={loading ? 'Creating...' : 'Create User'}
       onSubmit={handleSubmit}
     >
       <UserFormFields

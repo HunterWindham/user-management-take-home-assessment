@@ -4,9 +4,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import type { User } from '../types';
 import { fetchUsers } from '../services/userService';
-import { LoadingState } from './LoadingState';
-import { ErrorState } from './ErrorState';
-import { DataTable, type Column } from './DataTable';
+import { LoadingState } from '../../../components/LoadingState';
+import { ErrorState } from '../../../components/ErrorState';
+import { DataTable, type Column } from '../../../components/DataTable';
 
 export type UsersTableProps = {
   onEditUser: (user: User) => void;
