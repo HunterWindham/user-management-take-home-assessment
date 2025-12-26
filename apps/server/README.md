@@ -73,10 +73,17 @@ The application expects the following environment variables:
 
 - `PORT` - Server port number (defaults to `8080`)
 - `DB_URL` - Firebase Realtime Database URL (required)
+- `FIREBASE_PROJECT_ID` - Firebase project ID (required)
+- `FIREBASE_PRIVATE_KEY_ID` - Firebase private key ID (required)
+- `FIREBASE_PRIVATE_KEY` - Firebase private key with `\n` for newlines (required)
+- `FIREBASE_CLIENT_EMAIL` - Firebase service account email (required)
+- `FIREBASE_CLIENT_ID` - Firebase client ID (required)
+- `FIREBASE_AUTH_URI` - OAuth2 auth URI (optional, defaults to Google's)
+- `FIREBASE_TOKEN_URI` - OAuth2 token URI (optional, defaults to Google's)
+- `FIREBASE_AUTH_PROVIDER_X509_CERT_URL` - Auth provider cert URL (optional)
+- `FIREBASE_CLIENT_X509_CERT_URL` - Client cert URL (optional)
+- `FIREBASE_UNIVERSE_DOMAIN` - Universe domain (optional, defaults to `googleapis.com`)
 
-Create a `.env` file in the root of the `apps/server` directory to configure these values.
+Create a `.env` file in the root of the `apps/server` directory to configure these values. You can copy `.env.example` as a starting point.
 
-## Firebase Setup
-
-The server requires a Firebase service account JSON file (`service-account.json`) in the root of the `apps/server` directory. This file contains the credentials needed to initialize the Firebase Admin SDK.
-
+**Note:** The `FIREBASE_PRIVATE_KEY` should include the full key with `\n` characters to represent newlines. The key will be automatically converted to proper newlines when loaded.
