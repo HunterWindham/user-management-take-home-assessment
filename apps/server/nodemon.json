@@ -1,0 +1,15 @@
+{
+  "watch": ["src"],
+  "ext": "ts,json",
+  "ignore": ["src/**/*.spec.ts", "node_modules"],
+  "exec": "ts-node src/index.ts",
+  "signal": "SIGTERM",
+  "verbose": false,
+  "delay": 1000,
+  "killTimeout": 5000,
+  "restartable": "rs",
+  "env": {
+    "NODE_ENV": "development"
+  }
+}
+

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {
-    "start": "dotenv -- nodemon src/index.ts localhost 8080",
+    "start": "dotenv -- nodemon",
     "lint": "eslint .",
     "lint:fix": "eslint --fix ."
   },
